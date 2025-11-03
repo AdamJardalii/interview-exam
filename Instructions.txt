@@ -1,0 +1,133 @@
+
+CADABRA TAKE-HOME TEST 
+
+API:
+1. Receives CAD part files
+2. Reads information from those files
+3. Analyzes the parts and gives insights
+4. Saves the results so they can be retrieved later
+
+
+Program.cs
+   starts the app and wires everything together
+   
+
+Controllers/CadController.cs
+   handles incoming requests from users
+   
+   What it does:
+   - POST /api/cad/analyze → Accept a file and analyze it
+   - GET /api/cad/analysis/{id} → Get saved analysis by ID
+   - GET /api/cad/health → Check if the API is running
+   - You need to add 2 more endpoints (list all, delete, etc.)
+   
+
+Models/AnalysisResponse.cs
+   defines what data looks like
+   Don't need to change this, the data models already defined for you
+   
+   Contains:
+   - AnalysisResponse: The complete result with metadata and analysis
+   - PartMetadata: Info about the CAD part (name, size, material, etc.)
+   - Dimensions: Length, width, height
+   - AIAnalysis: The insights and recommendations
+   - HealthResponse: Simple status check
+   
+   The templates/forms you fill out
+
+
+Services/ICadProcessingService.cs + CadProcessingService.cs
+   extracts information from CAD files
+   Implement ExtractMetadataAsync()
+   
+   What it does:
+   - Takes a file stream
+   - Reads the JSON mock data (SampleData/)
+   - Extracts: part name, dimensions, material, mass, custom properties
+   - Returns a PartMetadata object
+   
+
+Services/IAIAnalysisService.cs + AIAnalysisService.cs
+   generates insights about the part
+   Implement GenerateAnalysisAsync()
+   (AI/LLM integration is OPTIONAL - you can do basic analysis)
+   
+   What it does:
+   - Takes part metadata (what CadProcessingService extracted)
+   - Analyzes it
+   - Returns insights and recommendations
+   - Can use AI/LLM or just basic logic
+   
+
+Services/IAnalysisStorageService.cs + AnalysisStorageService.cs
+   saves and retrieves analysis results
+   Implement all 4 methods
+   
+   What it does:
+   - SaveAnalysisAsync() → Save a completed analysis
+   - GetAnalysisAsync() → Retrieve by ID
+   - DeleteAnalysisAsync() → Delete by ID
+   - GetAllAnalysesAsync() → Get list of all saved analyses
+   
+   Implementation options:
+   - Simple: Use a Dictionary/ConcurrentDictionary (in-memory)
+   - Advanced: Use a database (SQLite, SQL Server)
+   
+
+SampleData/mock_part_data.json + mock_part_data_2.json
+   Use these to test your code, Upload them via Swagger
+   
+   Contains example data like:
+   - Part name, dimensions, material
+   - Mass properties, custom properties
+   - All the info your CadProcessingService needs to extract
+
+
+1. User uploads a file → CadController.AnalyzePart()
+2. Controller validates file → Checks size, extension
+3. Controller calls CadProcessingService → Extracts metadata from file
+4. Controller calls AIAnalysisService → Generates analysis/insights
+5. Controller calls AnalysisStorageService → Saves the result
+6. Controller returns the saved analysis → User gets back the result
+
+Later:
+- User requests analysis by ID → Controller calls StorageService.GetAnalysisAsync()
+- Controller returns the saved analysis
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. ⬜ Program.cs → Uncomment service registrations (lines 23-25)
+2. ⬜ CadController.cs → Implement AnalyzePart(), GetAnalysis(), add 2 more endpoints
+3. ⬜ CadProcessingService.cs → Implement ExtractMetadataAsync()
+4. ⬜ AIAnalysisService.cs → Implement GenerateAnalysisAsync() (basic or AI)
+5. ⬜ AnalysisStorageService.cs → Implement all 4 storage methods
+
+
+1. Start small: Get one thing working, then move to the next
+2. Use Swagger: Visit http://localhost:5000/swagger to test your API
+3. Test with sample data: Upload the mock_part_data.json files
+4. Read error messages: They usually tell you exactly what's wrong
+5. Logging helps: Use _logger.LogInformation() to see what's happening
+
