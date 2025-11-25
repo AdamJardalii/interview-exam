@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 namespace CadabraTest.API.Models;
 
 /// <summary>
@@ -5,12 +9,16 @@ namespace CadabraTest.API.Models;
 /// </summary>
 public class AnalysisResponse
 {
+    [Key]
+    public Guid Id { get; set; }
     public Guid AnalysisId { get; set; }
     public string Status { get; set; } = "processing"; // processing, completed, failed
+    public string UserId { get; set; } = default!;
     public PartMetadata? PartMetadata { get; set; }
     public AIAnalysis? AIAnalysis { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
+    
 }
 
 /// <summary>
@@ -43,6 +51,7 @@ public class Dimensions
 /// </summary>
 public class AIAnalysis
 {
+    public Guid Id { get; set; }
     public string Summary { get; set; } = string.Empty;
     public List<string> Insights { get; set; } = new();
     public List<string> Recommendations { get; set; } = new();

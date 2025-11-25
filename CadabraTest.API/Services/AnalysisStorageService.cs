@@ -1,4 +1,9 @@
 using CadabraTest.API.Models;
+using CadabraTest.API.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Text;
+
 
 namespace CadabraTest.API.Services;
 
@@ -9,41 +14,88 @@ namespace CadabraTest.API.Services;
 public class AnalysisStorageService : IAnalysisStorageService
 {
     private readonly ILogger<AnalysisStorageService> _logger;
+    private readonly AppDbContext _dbContext;
 
-    public AnalysisStorageService(ILogger<AnalysisStorageService> logger)
+    private readonly Dictionary<Guid, AnalysisResponse> _storage = new();
+
+
+    public AnalysisStorageService(ILogger<AnalysisStorageService> logger,AppDbContext dbContext)
     {
         _logger = logger;
+        _dbContext = dbContext;
     }
 
-    public Task<AnalysisResponse> SaveAnalysisAsync(AnalysisResponse analysis)
+    public async Task<AnalysisResponse> SaveAnalysisAsync(AnalysisResponse analysis)
     {
-        // TODO: Implement storage for analysis results
-        // You can use:
-        // - In-memory storage (Dictionary/ConcurrentDictionary)
-        // - Database (SQLite, SQL Server, etc.)
-        // - Other storage solutions
-        
-        throw new NotImplementedException("Implement storage for analysis results");
+        if (!_dbContext.Analyses.Any(a => a.AnalysisId == analysis.AnalysisId))
+        {
+            analysis.Id = Guid.NewGuid();
+            analysis.CreatedAt = DateTime.UtcNow;
+
+            _dbContext.Analyses.Add(analysis);
+            await _dbContext.SaveChangesAsync();
+        }
+        else
+        {
+            _dbContext.Analyses.Update(analysis);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        return analysis;
     }
 
-    public Task<AnalysisResponse?> GetAnalysisAsync(Guid analysisId)
-    {
-        // TODO: Retrieve analysis by ID
+
+    // public Task<AnalysisResponse> SaveAnalysisAsync(AnalysisResponse analysis)
+    // {
+    //     _storage[analysis.AnalysisId] = analysis;
+    //     return Task.FromResult(analysis);
+    //     // TODO: Implement storage for analysis results
+    //     // You can use:
+    //     // - In-memory storage (Dictionary/ConcurrentDictionary)
+    //     // - Database (SQLite, SQL Server, etc.)
+    //     // - Other storage solutions
         
-        throw new NotImplementedException("Implement retrieval of analysis by ID");
+    // }
+
+    // public Task<AnalysisResponse?> GetAnalysisAsync(Guid analysisId)
+    // {
+    //     _storage.TryGetValue(analysisId, out var analysis);
+    //     return Task.FromResult(analysis);
+    // }
+    public async Task<AnalysisResponse?> GetAnalysisAsync(Guid analysisId)
+    {
+        return await _dbContext.Analyses
+            .Include(a => a.AIAnalysis)
+            .FirstOrDefaultAsync(a => a.AnalysisId == analysisId);
     }
 
-    public Task<bool> DeleteAnalysisAsync(Guid analysisId)
-    {
-        // TODO: Delete analysis by ID
-        
-        throw new NotImplementedException("Implement deletion of analysis");
-    }
 
-    public Task<List<AnalysisResponse>> GetAllAnalysesAsync()
+    // public Task<bool> DeleteAnalysisAsync(Guid analysisId)
+    // {
+    //     var removed = _storage.Remove(analysisId);
+    //     return Task.FromResult(removed);
+    // }
+
+    public async Task<bool> DeleteAnalysisAsync(Guid analysisId)
     {
-        // TODO: Retrieve all analyses
-        
-        throw new NotImplementedException("Implement retrieval of all analyses");
+        var analysis = await _dbContext.Analyses.FirstOrDefaultAsync(a => a.AnalysisId == analysisId);
+        if (analysis == null) return false;
+
+        _dbContext.Analyses.Remove(analysis);
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
+    // public Task<List<AnalysisResponse>> GetAllAnalysesAsync()
+    // {
+    //     var all = _storage.Values.ToList();
+    //     return Task.FromResult(all);
+    // }
+
+    public async Task<List<AnalysisResponse>> GetAllAnalysesAsync(string userId)
+    {
+        return await _dbContext.Analyses
+            .Include(a => a.AIAnalysis)
+            .Where(a => a.UserId == userId)
+            .ToListAsync();
     }
 }

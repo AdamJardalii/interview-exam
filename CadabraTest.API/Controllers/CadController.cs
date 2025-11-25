@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using CadabraTest.API.Models;
 using CadabraTest.API.Services;
+using CadabraTest.API.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+
 
 namespace CadabraTest.API.Controllers;
 
@@ -14,14 +18,17 @@ public class CadController : ControllerBase
 {
     private readonly ILogger<CadController> _logger;
     // TODO: Inject your services here
-    // private readonly ICadProcessingService _cadProcessingService;
-    // private readonly IAIAnalysisService _aiAnalysisService;
-    // private readonly IAnalysisStorageService _storageService;
+    private readonly ICadProcessingService _cadProcessingService;
+    private readonly IAIAnalysisService _aiAnalysisService;
+    private readonly IAnalysisStorageService _storageService;
     // private readonly IConfiguration _configuration;
 
-    public CadController(ILogger<CadController> logger)
+    public CadController(ILogger<CadController> logger,ICadProcessingService CadProcessingService,IAIAnalysisService AIAnalysisService,IAnalysisStorageService AnalysisStorageService)
     {
         _logger = logger;
+        _cadProcessingService = CadProcessingService;
+        _aiAnalysisService = AIAnalysisService;
+        _storageService = AnalysisStorageService;
         // TODO: Add service parameters and initialize them
     }
 
@@ -30,12 +37,42 @@ public class CadController : ControllerBase
     /// TODO: Implement this endpoint
     /// </summary>
     [HttpPost("analyze")]
+    [Authorize]
     [ProducesResponseType(typeof(AnalysisResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AnalyzePart(
         IFormFile? file,
         [FromForm] bool includeAIAnalysis = true)
     {
+        var validator = new FileValidator(new FileValidationOptions());
+        var result = validator.Validate(file);
+
+        if (!result.IsValid)
+            return BadRequest(result.Error);
+        
+        using var stream = file!.OpenReadStream();
+
+        var partMetadata = await _cadProcessingService.ExtractMetadataAsync(stream, file.FileName);
+
+        AIAnalysis? aiAnalysis = await _aiAnalysisService.GenerateAnalysisAsync(partMetadata);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+         var analysisResponse = new AnalysisResponse
+        {
+            AnalysisId = Guid.NewGuid(),
+            Status = "completed",
+            PartMetadata = partMetadata,
+            AIAnalysis = aiAnalysis,
+            CreatedAt = DateTime.UtcNow,
+            CompletedAt = DateTime.UtcNow,
+            UserId = userId!
+        };
+
+        await _storageService.SaveAnalysisAsync(analysisResponse);
+
+        return Ok(analysisResponse);
+
+
         // TODO: Implement this endpoint
         // 1. Validate the uploaded file (size, extension)
         // 2. Extract metadata from the CAD file using CadProcessingService
@@ -43,7 +80,7 @@ public class CadController : ControllerBase
         // 4. Save the analysis using AnalysisStorageService
         // 5. Return the analysis response
         
-        return BadRequest(new { error = "Not implemented yet" });
+        return BadRequest(new { error = " Hello World!" });
     }
 
     /// <summary>
@@ -51,16 +88,69 @@ public class CadController : ControllerBase
     /// TODO: Implement this endpoint
     /// </summary>
     [HttpGet("analysis/{analysisId}")]
+    [Authorize] 
     [ProducesResponseType(typeof(AnalysisResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAnalysis(Guid analysisId)
     {
-        // TODO: Implement this endpoint
-        // 1. Retrieve analysis result by ID using AnalysisStorageService
+          // 1. Retrieve analysis by ID
+        var analysis = await _storageService.GetAnalysisAsync(analysisId);
+
         // 2. Return 404 if not found
-        // 3. Return analysis response
+        if (analysis == null)
+        {
+            return NotFound(new { error = $"Analysis with ID {analysisId} not found." });
+        }
         
-        return NotFound(new { error = "Not implemented yet" });
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // 4. Check if the analysis belongs to the authenticated user
+        if (analysis.UserId != userId)
+            return Forbid(); // 403 Forbidden
+
+        // 3. Return 200 OK with the analysis
+        return Ok(analysis);
+    }
+
+    [HttpGet("all")]
+    [Authorize]
+    public async Task<IActionResult> GetAllAnalyses()
+    {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized();
+        var analyses = await _storageService.GetAllAnalysesAsync(userId);
+        return Ok(new
+        {
+            count = analyses.Count,
+            items = analyses
+        });
+    }
+
+    [HttpDelete("analysis/{analysisId}")]
+    [Authorize] 
+    [ProducesResponseType(typeof(AnalysisResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> DeleteAnalysis(Guid analysisId)
+    {
+
+        var analysis = await _storageService.GetAnalysisAsync(analysisId);
+
+        if (analysis == null)
+            return NotFound(new { error = "Analysis not found", analysisId });
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized();
+
+        if (analysis.UserId != userId)
+            return Forbid(); 
+
+        var deleted = await _storageService.DeleteAnalysisAsync(analysisId);        
+
+        return Ok(new { message = "Analysis deleted successfully", analysisId});
     }
 
     /// <summary>

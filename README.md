@@ -6,21 +6,26 @@ Welcome to the CADABRA take-home exam! We're excited to see what you can build.
 
 ### Important: Deadline
 
-**Your solution is due on Sunday, November 9th at 6:00 PM PST.**
+**Your solution is due on Sunday, November 30th at 11:59 PM Lebanese Standard Time.**
 
 ### About This Exam
 
 This is a take-home assignment where you'll build a **CAD Part Analysis API** using ASP.NET Core. The goal is to assess your ability to implement a RESTful API, work with services, handle file uploads, and structure code effectively.
 
+### How to Get the Starter Code
+
+**Download the starter code from Google Drive**: [Download Starter Code](https://drive.google.com/file/d/1AQMJWMNVz0AL_NeDQjeP6W4jyTdTWnok/view?usp=sharing)
+
+1. Download and extract the ZIP file
+2. Work on your solution locally
+
 ### How to Submit
 
-**Please submit your solution via GitHub**:
+**Submit your solution via Google Drive**:
 
-1. **Push your completed solution to a GitHub repository**
-2. **Share the repository link** via email to team@cadabrai.com
-3. **Optional**: Include a 2-minute video walkthrough if you'd like (MP4 or link)
-
-See the **"GitHub Submission Instructions"** section below for detailed steps.
+1. **Create a ZIP file** of your completed `CadabraTest` folder
+2. **Upload to Google Drive** along with your optional demo video (if you made one)
+3. **Share the Drive link** via email to team@cadabrai.com
 
 ### What You Should Know
 
@@ -101,7 +106,7 @@ You are building a **CAD Part Analysis API** that processes CAD part files, extr
 
 ## Main Confusion Points - CLARIFIED
 
-### 1. **File Format Understanding** ⚠️ IMPORTANT
+### 1. **File Format Understanding** IMPORTANT
 
 - **You are NOT processing actual CAD files** (like `.sldprt`, `.step`, etc.)
 - Instead, you receive **JSON files** that represent CAD part data
@@ -112,7 +117,7 @@ You are building a **CAD Part Analysis API** that processes CAD part files, extr
   - Extract relevant fields and map them to the `PartMetadata` model
   - Return the structured metadata
 
-### 2. **AI/LLM Integration is OPTIONAL** ✅
+### 2. **AI/LLM Integration is OPTIONAL** 
 
 - The `AIAnalysisService` does NOT require actual AI/LLM integration
 - You can implement basic analysis logic based on the part metadata
@@ -150,7 +155,7 @@ You are building a **CAD Part Analysis API** that processes CAD part files, extr
 
 The following **3 endpoints** are provided in the starter code in `CadController.cs`. You need to **implement** the first two (they're currently stubbed), while the third is already functional:
 
-### 1. **POST /api/cad/analyze** - AnalyzePart() ⚠️ **Needs Implementation**
+### 1. **POST /api/cad/analyze** - AnalyzePart() **Needs Implementation**
 
 - **Purpose**: Accepts a file upload and analyzes a CAD part
 - **Parameters**:
@@ -159,7 +164,7 @@ The following **3 endpoints** are provided in the starter code in `CadController
 - **Returns**: `AnalysisResponse` with analysis results
 - **Status**: Currently returns "Not implemented yet" - **YOU MUST IMPLEMENT THIS**
 
-### 2. **GET /api/cad/analysis/{analysisId}** - GetAnalysis() ⚠️ **Needs Implementation**
+### 2. **GET /api/cad/analysis/{analysisId}** - GetAnalysis() **Needs Implementation**
 
 - **Purpose**: Retrieves a saved analysis by its unique ID
 - **Parameters**:
@@ -167,13 +172,13 @@ The following **3 endpoints** are provided in the starter code in `CadController
 - **Returns**: `AnalysisResponse` if found, `404 Not Found` if not found
 - **Status**: Currently returns "Not implemented yet" - **YOU MUST IMPLEMENT THIS**
 
-### 3. **GET /api/cad/health** - HealthCheck() ✅ **Already Implemented**
+### 3. **GET /api/cad/health** - HealthCheck() **Already Implemented**
 
 - **Purpose**: Health check endpoint to verify API is running
 - **Returns**: `HealthResponse` with status "healthy", timestamp, and version
 - **Status**: Already functional - no changes needed
 
-### Additional Endpoints Required 📝
+### Additional Endpoints Required
 
 You must add **at least 2 more endpoints** beyond these 3. Examples:
 
@@ -186,14 +191,14 @@ You must add **at least 2 more endpoints** beyond these 3. Examples:
 
 ## Optional Steps
 
-### 🔹 Optional: AI/LLM Integration
+### Optional: AI/LLM Integration
 
 - If you want to add real AI analysis, you can:
   - Uncomment line 19 in `Program.cs` to add HttpClient
   - Integrate with OpenAI, Anthropic, or other LLM providers
   - This is **not required** - basic analysis is fine
 
-### 🔹 Optional: Database Storage
+### Optional: Database Storage
 
 - Instead of in-memory storage, you can use:
   - SQLite (easy to set up)
@@ -201,7 +206,7 @@ You must add **at least 2 more endpoints** beyond these 3. Examples:
   - Entity Framework Core
   - In-memory storage is perfectly acceptable for this exam
 
-### 🔹 Optional: Additional Middleware
+### Optional: Additional Middleware
 
 - Error handling middleware
 - Request logging
@@ -284,86 +289,6 @@ CadabraTest.API/
 └── Program.cs                      # Service registration (TODO: uncomment)
 ```
 
----
 
-## Verifying Your Solution
-
-Before submitting, verify that your implementation works correctly. Follow these verification steps:
-
-### ✅ Verification Checklist
-
-#### 1. **Application Starts Successfully**
-
-- Run `dotnet run` from the `CadabraTest.API` directory
-- Application should start without errors
-- Navigate to `http://localhost:5000/swagger` and verify Swagger UI loads
-
-#### 2. **Health Check Endpoint**
-
-- **Test**: `GET /api/cad/health`
-- **Expected**: Returns `200 OK` with status "healthy"
-- **Verify**: Response includes timestamp and version
-
-#### 3. **Analyze Endpoint - File Upload**
-
-- **Test**: `POST /api/cad/analyze`
-  - Upload `SampleData/mock_part_data.json`
-  - Try with `includeAIAnalysis=true` (default)
-  - Try with `includeAIAnalysis=false`
-- **Expected**:
-  - Returns `200 OK` with `AnalysisResponse`
-  - Response includes:
-    - Unique `AnalysisId` (Guid)
-    - `Status` = "completed"
-    - `PartMetadata` with extracted data (part name, dimensions, material, mass, etc.)
-    - `AIAnalysis` (if `includeAIAnalysis=true`)
-    - `CreatedAt` and `CompletedAt` timestamps
-- **Verify**:
-  - File validation works (try uploading an invalid file - should return 400)
-  - Metadata extraction is correct (compare with original JSON)
-  - Analysis insights are generated
-
-#### 4. **Get Analysis by ID**
-
-- **Test**: `GET /api/cad/analysis/{id}`
-  - Use the `AnalysisId` from step 3
-  - Try with a non-existent ID (should return 404)
-- **Expected**:
-  - Returns `200 OK` with the saved `AnalysisResponse`
-  - Returns `404 Not Found` for invalid IDs
-- **Verify**: Retrieved data matches what was saved
-
----
-
-## GitHub Submission Instructions
-
-### Step 1: Fork the Repository
-
-1. Go to the public repository URL (you'll receive this)
-2. Click **"Fork"** → Clone your fork:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/CadabraTest.git
-   cd CadabraTest
-   ```
-
-### Step 2: Push Your Solution
-
-When done, push your changes:
-
-```bash
-git add .
-git commit -m "Completed solution"
-git push
-```
-
-Use a **Personal Access Token** for authentication (generate at: https://github.com/settings/tokens)
-
-### Step 3: Submit
-
-Email **team@cadabrai.com** with your **fork URL**.
-
-**If your fork is private**: Go to Settings → Collaborators → Add people → Add the reviewer's GitHub username.
-
----
 
 Good luck!
