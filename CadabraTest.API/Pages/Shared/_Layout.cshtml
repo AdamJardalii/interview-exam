@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Cadabra</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="/">Home</a>
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <a href="/Analyses">My Analyses</a>
+                <form method="post" asp-page="/Logout" class="inline-form">
+                    <button type="submit">Logout</button>
+                </form>
+            }
+            else
+            {
+                <a href="/Login">Login</a>
+                <a href="/Signup">Signup</a>
+            }
+        </nav>
+    </header>
+
+    <main role="main" class="container">
+        @RenderBody()
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Cadabra. All rights reserved.</p>
+    </footer>
+</body>
+</html>

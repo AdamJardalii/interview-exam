@@ -1,0 +1,14 @@
+@page
+@model CadabraTest.API.Pages.IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="hero">
+    <h1>Welcome to Cadabra CAD Analyzer</h1>
+    <p>Upload your CAD files and get AI-powered analysis instantly.</p>
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <a href="/Signup" class="btn-primary">Get Started</a>
+    }
+</div>

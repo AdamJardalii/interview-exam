@@ -176,3 +176,12 @@ C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\n
 C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\CadabraTest.API.pdb
 C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\CadabraTest.API.genruntimeconfig.cache
 C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\ref\CadabraTest.API.dll
+C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\bin\Debug\net9.0\CadabraTest.API.staticwebassets.runtime.json
+C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\compressed\1sjvmartzi-{0}-n98cnfwrhs-n98cnfwrhs.gz
+C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\compressed\y6k36s2gmd-{0}-05izrcuppy-05izrcuppy.gz
+C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\compressed\5cx3oavn73-{0}-8srndugl9q-8srndugl9q.gz
+C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\compressed\due3whlmmw-{0}-nbtsyeq1ll-nbtsyeq1ll.gz
+C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\compressed\a3toil3g49-{0}-fvfnbm1xvg-fvfnbm1xvg.gz
+C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\CadabraTest.API.RazorAssemblyInfo.cache
+C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\CadabraTest.API.RazorAssemblyInfo.cs
+C:\Users\Admin\Downloads\CadabraTest 3\CadabraTest 3\CadabraTest.API\obj\Debug\net9.0\compressed\woc665pbpx-{0}-5ipweew5fc-5ipweew5fc.gz

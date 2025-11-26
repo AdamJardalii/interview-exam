@@ -14,6 +14,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ICadProcessingService, CadProcessingService>();
 builder.Services.AddScoped<IAIAnalysisService, AIAnalysisService>();
 builder.Services.AddScoped<IAnalysisStorageService, AnalysisStorageService>();
+builder.Services.AddRazorPages();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -69,6 +70,21 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy  =>
+                      {
+                          policy.WithOrigins("http://127.0.0.1:5500") // your frontend origin
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
+
+// later in the pipeline
+
 // TODO: Add HTTP client for AI service if you want to use LLM providers (optional)
 // builder.Services.AddHttpClient<AIAnalysisService>();
 
@@ -94,11 +110,16 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseStaticFiles();
 // TODO: Add middleware as needed
 // app.UseCors();
 app.UseHttpsRedirection();
 // app.UseAuthorization(); // Remove if no authentication configured
 app.MapControllers();
+
+app.UseCors(MyAllowSpecificOrigins);
+app.MapRazorPages();
+
 
 app.Run();
 

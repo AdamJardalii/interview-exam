@@ -1,0 +1,16 @@
+@page
+@model SignupModel
+@{
+    ViewData["Title"] = "Signup";
+}
+
+<h2>Create an Account</h2>
+<form method="post">
+    <label>Email:</label>
+    <input asp-for="Email" type="email" required />
+
+    <label>Password:</label>
+    <input asp-for="Password" type="password" required />
+
+    <button type="submit" class="btn-primary">Signup</button>
+</form>
